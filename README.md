@@ -63,6 +63,12 @@
 |---------------|-----------|-------|------------|
 | MYSQL/AURORA  | TCP       | 3306  | SG-PRIVATE |
 #
+## Criação do EndPoint
+- Acessar o serviço de VPC e no menu lateral ir ate "Virtual private cloud" e acessar Endpoint.
+- No canto superior direito acessar "Create endpoint".
+- De um nome, se quiser, e selecione "EC2 Instance Connect Endpoint".
+- Selecione a VPC cirada anteriormente, em Security group selecione a SG pública e por fim uma subnet privada.
+#
 ## Criação do RDS (Relational Database Service)
 - Acessar o serviço do RDS e na página inicial acessar "Create database".
 - Deixar padrão exceto:
@@ -118,3 +124,27 @@
             WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yml
       cd /mnt/efs && sudo docker-compose up -d
       ```
+#
+## Criação do EFS (Elastic File System)
+- Acessar o serviço EFS e na página inicial acessar "Create a file system".
+- Criar um nome, se quiser, e selecionar a VPC criada anteriormente.
+- Selecionar as subnets privadas e o SG criado para o EFS.
+#
+## Criação do LB (Load Balancer)
+- Acessar o serviço EC2, no menu lateral ir até "Load Balancing" e acessar "Load Balancers".
+- No canto superior direito acesse "Create load balancer".
+- Selecione o "Classic Load Balancer".
+- De um nome ao LB e escolha as seguintes opções:
+  - Selecione a VPC criada anteriormente;
+  - Em "Mappings" selecione as duas AZs e selecione as duas subnets públicas;
+  - Selecione o SG Público criado anteriormente;
+  - Em "Listeners and routing" adicione um listener com protocolo tcp e porta 22;
+  - Em "Health check" altere para tcp e porta 22;
+  - Crie a LB.
+#
+## Criação do AS (Auto Scaling)
+- Acessar o serviço EC2, no menu lateral ir até "Auto Scaling" e acessar "Auto Scaling group".
+- Na página inicial acessar "Create Auto Scaling group".
+- Em "Choose lauch template" de um nome ao AS e selecione o template de EC2 criado anteriormente.
+- Em "Choose instance lauch options" seleciopne a VPC criada e as duas subnets privadas. 
+- Em "Configuere advanced options" selecione "Attach to an existing load balancer" e selecione o LB criado.
