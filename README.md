@@ -6,8 +6,12 @@
 * [Documentação](#-documenta%C3%A7%C3%A3o-)
 * [Criação da VPC (Virtual Private Cloud)](#criação-da-vpc-virtual-private-cloud)
 * [Criação dos SG (Security Groups)](#criação-dos-sg-security-groups)
+* [Criação do EP (EndPoint)](#criação-do-ep-endpoint)
 * [Criação do RDS (Relational Database Service)](#criação-do-rds-relational-database-service)
 * [Criação do template da EC2 (Elastic Compute Cloud)](#criação-do-template-da-ec2-elastic-compute-cloud)
+* [Criação do EFS (Elastic File System)](#criação-do-efs-elastic-file-system)
+* [Criação do LB (Load Balancer)](#criação-do-lb-load-balancer)
+* [Criação do AS (Auto Scaling)](#criação-do-as-auto-scaling)
 #
 # Objetivos
 - Instalação e configuração do DOCKER ou CONTAINERD no host EC2;
@@ -63,7 +67,7 @@
 |---------------|-----------|-------|------------|
 | MYSQL/AURORA  | TCP       | 3306  | SG-PRIVATE |
 #
-## Criação do EndPoint
+## Criação do EP (EndPoint)
 - Acessar o serviço de VPC e no menu lateral ir ate "Virtual private cloud" e acessar Endpoint.
 - No canto superior direito acessar "Create endpoint".
 - De um nome, se quiser, e selecione "EC2 Instance Connect Endpoint".
