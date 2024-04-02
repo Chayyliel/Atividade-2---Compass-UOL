@@ -12,4 +12,5 @@ services:
       WORDPRESS_DB_USER: atividade2
       WORDPRESS_DB_PASSWORD: 123teste456
       WORDPRESS_DB_NAME: atividade2
-      WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yml cd /mnt/efs && sudo docker-compose up -d
+      WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yml 
+cd /mnt/efs && sudo docker-compose up -d
