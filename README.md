@@ -8,8 +8,8 @@
 * [Criação dos SG (Security Groups)](#criação-dos-sg-security-groups)
 * [Criação do EP (EndPoint)](#criação-do-ep-endpoint)
 * [Criação do RDS (Relational Database Service)](#criação-do-rds-relational-database-service)
-* [Criação do template da EC2 (Elastic Compute Cloud)](#criação-do-template-da-ec2-elastic-compute-cloud)
 * [Criação do EFS (Elastic File System)](#criação-do-efs-elastic-file-system)
+* [Criação do template da EC2 (Elastic Compute Cloud)](#criação-do-template-da-ec2-elastic-compute-cloud)
 * [Criação do LB (Load Balancer)](#criação-do-lb-load-balancer)
 * [Criação do AS (Auto Scaling)](#criação-do-as-auto-scaling)
 #
@@ -38,6 +38,9 @@
 ## Criação da VPC (Virtual Private Cloud)
 - Acessar o serviço de VPC e na paginá inicial entrar em "Create VPC".
 - Na aba de criação deixamos a maioria das opções no padrão, VPC and more, 2 AZs, 2 Public subnets, 2 Private subnets, mudando apenas o nome, se quiser, e alterando o NAT gateway para "1 per AZ".
+
+![Route Table](https://github.com/Chayyliel/Atividade-2---Compass-UOL/assets/142858638/12588d60-b0e3-4434-addc-9695bd473a39)
+
 #
 ## Criação dos SG (Security Groups)
 - Acessar o serviço de EC2, na aba lateral ir ate o grupo "Network & Security" e selecionar "Security Groups".
@@ -78,20 +81,25 @@
 - Deixar padrão exceto:
   - "Engine options" = MySQL
   - "Templates" = Free tier
-  - "Settings" = Mudar DB cluster identifier e Master username para um de sua preferência, selecionar "Self Managed" e criar um "Master password".
+  - "Settings" = Mudar "DB cluster identifier" e "Master username" para um de sua preferência, selecionar "Self Managed" e criar um "Master password".
   - "Connectivity" = Selecionar a VPC e o SG que criou para o RDS.
+#
+## Criação do EFS (Elastic File System)
+- Acessar o serviço EFS e na página inicial acessar "Create a file system".
+- Acesse "Customize" no final da página.
+- Criar um nome, se quiser, em "Network access" selecionar a VPC criada anteriormente, as subnets privadas e o SG criado para o EFS.
 #
 ## Criação do template da EC2 (Elastic Compute Cloud)
 - Acessar o serviço EC2 e na aba lateral ir no grupo "instances" e selecionar "Launch Templates".
 - Na página inicial acessar "Create launch template".
 - Daremos o nome ao template, uma descrição e escolheremos as seguintes opções:
   - "OS Images" = Amazon Linux 2;
-  - "Instance type" = t2.micro;
+  - "Instance type" = t3.micro;
   - Criar uma "Key Pair" e salvar;
   - "Network settings > Subnet" = Don't include in launch template;
     - "Network settings > Firewall" = Select existing security group;
       - "Network settings > Security groups" = Selecionar o SG-PRIVATE.
-  - "Storage" = Adicionar novo volume Size = 8 Volume type = gp3;
+  - "Storage" = Adicionar novo volume Size = 8 Volume type = gp2;
   - "Resource tags" = Adiconar as tags do PB da Compass;
   - "Advanced details" = Adicionar um User data com as seguintes configurações:
     - ```bash
@@ -121,18 +129,13 @@
             - 80:80
           restart: always
           environment:
-            WORDPRESS_DB_HOST: <Ednpoint do DB>
+            WORDPRESS_DB_HOST: <Host do DB>
             WORDPRESS_DB_USER: <Master user do DB>
             WORDPRESS_DB_PASSWORD: <Master password do DB>
-            WORDPRESS_DB_NAME: <Initial Name do DB>
+            WORDPRESS_DB_NAME: <Name do DB>
             WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yml
       cd /mnt/efs && sudo docker-compose up -d
       ```
-#
-## Criação do EFS (Elastic File System)
-- Acessar o serviço EFS e na página inicial acessar "Create a file system".
-- Criar um nome, se quiser, e selecionar a VPC criada anteriormente.
-- Selecionar as subnets privadas e o SG criado para o EFS.
 #
 ## Criação do LB (Load Balancer)
 - Acessar o serviço EC2, no menu lateral ir até "Load Balancing" e acessar "Load Balancers".
@@ -152,3 +155,8 @@
 - Em "Choose lauch template" de um nome ao AS e selecione o template de EC2 criado anteriormente.
 - Em "Choose instance lauch options" seleciopne a VPC criada e as duas subnets privadas. 
 - Em "Configuere advanced options" selecione "Attach to an existing load balancer" e selecione o LB criado.
+- Selecione "Turn on Elastic Load Balancing health checks".
+- Em "Scaling":
+  - "Scaling limits" = Min 2 - Max 4
+  - "Automatic scaling" = "Target tracking scaling policy"
+  - "Target value" = 80
