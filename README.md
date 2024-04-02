@@ -129,7 +129,7 @@
             - 80:80
           restart: always
           environment:
-            WORDPRESS_DB_HOST: <Host do DB>
+            WORDPRESS_DB_HOST: <EndPoint do DB>
             WORDPRESS_DB_USER: <Master user do DB>
             WORDPRESS_DB_PASSWORD: <Master password do DB>
             WORDPRESS_DB_NAME: <Name do DB>
