@@ -1,16 +1,14 @@
-echo "version: '3.8'
 services:
   wordpress:
-    image: wordpress:lastest
+    image: wordpress:latest
     volumes:
       - /mnt/efs/wordpress:/var/www/html
     ports:
       - 80:80
     restart: always
     environment:
-      WORDPRESS_DB_HOST: atividade2.cpiskoe4u286.us-east-1.rds.amazonaws.com
-      WORDPRESS_DB_USER: atividade2
-      WORDPRESS_DB_PASSWORD: 123teste456
-      WORDPRESS_DB_NAME: atividade2
-      WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yml 
-cd /mnt/efs && sudo docker-compose up -d
+      WORDPRESS_DB_HOST: <Endpoint DB>
+      WORDPRESS_DB_USER: <Master user DB>
+      WORDPRESS_DB_PASSWORD: <Master password DB>
+      WORDPRESS_DB_NAME: <Name DB>
+      WORDPRESS_TABLE_CONFIG: wp_ | sudo tee /mnt/efs/docker-compose.yaml
