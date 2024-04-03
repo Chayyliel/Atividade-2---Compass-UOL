@@ -79,8 +79,10 @@
 - Deixar padrão exceto:
   - "Engine options" = MySQL
   - "Templates" = Free tier
-  - "Settings" = Mudar "DB cluster identifier" e "Master username" para um de sua preferência, selecionar "Self Managed" e criar um "Master password".
+  - "Settings" = Mudar o "Master username" (esse será usado no "WORDPRESS_DB_USER:" no arquivo docker compose) selecionar "Self Managed" e criar um "Master password" (esse será usado no "WORDPRESS_DB_PASSWORD:" no arquivo docker compose).
   - "Connectivity" = Selecionar a VPC e o SG que criou para o RDS.
+  - "Additional configuration" = Criar um "Initial database name" (esse será usado no "WORDPRESS_DB_NAME:" no arquivo docker compose)
+- Selecionar "Create database" para criar o RDS.
 #
 ## Criação do EFS (Elastic File System)
 - Acessar o serviço EFS e na página inicial acessar "Create a file system".
@@ -97,9 +99,8 @@
   - "Network settings > Subnet" = Don't include in launch template;
     - "Network settings > Firewall" = Select existing security group;
       - "Network settings > Security groups" = Selecionar o SG-PRIVATE.
-  - "Storage" = Adicionar novo volume Size = 8 Volume type = gp2;
   - "Resource tags" = Adiconar as tags do PB da Compass;
-  - "Advanced details" = Adicionar um User data com as seguintes configurações:
+  - "Advanced details" = Adicionar um "User data" com as seguintes configurações:
     - ```bash
           #!/bin/bash
           sudo yum update -y
@@ -111,11 +112,13 @@
           sudo mkdir /mnt/efs
           sudo chmod +rwx /mnt/efs
           sudo yum install amazon-efs-utils -y
-          sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport <id-efs>.efs.us-east-1.amazonaws.com:/ mnt/efs
-          sudo sh -c 'echo "<id-efs>.efs.us-east-1.amazonaws.com:/ mnt/efs nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab'
+          sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-05f757969c22d65b4.efs.us-east-1.amazonaws.com:/ mnt/efs
+          sudo sh -c 'echo "fs-05f757969c22d65b4.efs.us-east-1.amazonaws.com:/ mnt/efs nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab'
           sudo usermod -aG docker ec2-user
           sudo chmod 666 /var/run/docker.sock
 
+          cat <<EOL > /mnt/efs/docker-compose.yml
+          version: '3.8'
           services:
             wordpress:
               image: wordpress:latest
@@ -125,13 +128,14 @@
                 - 80:80
               restart: always
               environment:
-                WORDPRESS_DB_HOST: <Endpoint DB>
-                WORDPRESS_DB_USER: <Master user DB>
-                WORDPRESS_DB_PASSWORD: <Master password DB>
-                WORDPRESS_DB_NAME: <Name DB>
-                WORDPRESS_TABLE_CONFIG: wp_ | sudo tee /mnt/efs/docker-compose.yaml
-      
-          docker-compose -f /mnt/efs/docker-compose.yaml up -d
+                WORDPRESS_DB_HOST: <Endpoint do DB>
+                WORDPRESS_DB_USER: <Master username do DB>
+                WORDPRESS_DB_PASSWORD: <Master password do DB>
+                WORDPRESS_DB_NAME: <Initial database name do DB>
+                WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yaml
+          EOL
+
+          docker-compose -f /mnt/efs/docker-compose.yml up -d
       ```
 #
 ## Criação do LB (Load Balancer)
@@ -143,8 +147,8 @@
   - Em "Mappings" selecione as duas AZs e selecione as duas subnets públicas;
   - Selecione o SG Público criado anteriormente;
   - Em "Listeners and routing" adicione um listener com protocolo tcp e porta 22;
-  - Em "Health check" altere para tcp e porta 22;
-  - Crie a LB.
+  - Em "Health check" altere para ping path para "/wp-admin/install.php";
+- Crie o LB.
 #
 ## Criação do AS (Auto Scaling)
 - Acessar o serviço EC2, no menu lateral ir até "Auto Scaling" e acessar "Auto Scaling group".
@@ -153,7 +157,13 @@
 - Em "Choose instance lauch options" seleciopne a VPC criada e as duas subnets privadas. 
 - Em "Configuere advanced options" selecione "Attach to an existing load balancer" e selecione o LB criado.
 - Selecione "Turn on Elastic Load Balancing health checks".
+- Em "Group size > Desired capacity" altere para 2.
 - Em "Scaling":
   - "Scaling limits" = Min 2 - Max 4
   - "Automatic scaling" = "Target tracking scaling policy"
   - "Target value" = 80
+#
+## Teste
+- Para testar se tudo esta funcionando corretamente, verifique se o "Health status" do LB está "In-service" para as duas instâncias e utilize o "DNS name" do LB para acessar a página através do navegador.
+#
+<h1 align="center"> FIM </h1>
