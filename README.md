@@ -12,6 +12,7 @@
 * [Criação do template da EC2 (Elastic Compute Cloud)](#criação-do-template-da-ec2-elastic-compute-cloud)
 * [Criação do LB (Load Balancer)](#criação-do-lb-load-balancer)
 * [Criação do AS (Auto Scaling)](#criação-do-as-auto-scaling)
+* [Teste](#teste)
 #
 # Objetivos
 - Instalação e configuração do DOCKER ou CONTAINERD no host EC2;
