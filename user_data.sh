@@ -15,7 +15,7 @@ sudo chmod 666 /var/run/docker.sock
 
 services:
   wordpress:
-    image: Wordpress:latest
+    image: wordpress:latest
     volumes:
       - /mnt/efs/wordpress:/var/www/html
     ports:
@@ -26,5 +26,6 @@ services:
       WORDPRESS_DB_USER: <Master user DB>
       WORDPRESS_DB_PASSWORD: <Master password DB>
       WORDPRESS_DB_NAME: <Name DB>
-      WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yaml
-cd /mnt/efs && sudo docker-compose up -d
+      WORDPRESS_TABLE_CONFIG: wp_ | sudo tee /mnt/efs/docker-compose.yaml
+      
+docker-compose -f /mnt/efs/docker-compose.yaml up -d
