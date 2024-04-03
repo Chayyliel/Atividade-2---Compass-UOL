@@ -15,7 +15,7 @@
 #
 # Objetivos
 - Instalação e configuração do DOCKER ou CONTAINERD no host EC2;
-     (Ponto adicional para o trabalho utilizar a instalação via script de Start Instance (user_data.sh))
+     (Ponto adicional para o trabalho utilizar a instalação via script de Start Instance "user_data.sh")
 - Efetuar Deploy de uma aplicação Wordpress com:
      Container de aplicação;
      RDS database Mysql;
