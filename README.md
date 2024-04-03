@@ -51,14 +51,12 @@
 | Tipo  | Protocolo | Porta | Origem    |
 |-------|-----------|-------|-----------|
 | HTTP  | TCP       | 80    | 0.0.0.0/0 |
-| HTTPS | TCP       | 443   | 0.0.0.0/0 |
 #
 **SG-PRIVATE**
 | Tipo  | Protocolo | Porta | Origem    |
 |-------|-----------|-------|-----------|
 | SSH   | TCP       | 22    | SG-PUBLIC |
 | HTTP  | TCP       | 80    | SG-PUBLIC |
-| HTTPS | TCP       | 443   | SG-PUBLIC |
 #
 **SG-EFS**
 | Tipo  | Protocolo | Porta | Origem     |
