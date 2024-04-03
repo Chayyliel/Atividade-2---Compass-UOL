@@ -103,38 +103,37 @@
   - "Resource tags" = Adiconar as tags do PB da Compass;
   - "Advanced details" = Adicionar um User data com as seguintes configurações:
     - ```bash
-      #!/bin/bash
-      sudo su
-      yum update -y
-      yum install docker -y
-      systemctl start docker
-      systemctl enable docker
-      usermod -aG docker ec2-user
-      curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-      chmod +x /usr/local/bin/docker-compose
-      mv /usr/local/bin/docker-compose /bin/docker-compose
-      yum install nfs-utils -y
-      mkdir /mnt/efs/
-      chmod +rwx /mnt/efs/
-      mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport <id_do_efs>.efs.<região_de_montagem_do_efs>.amazonaws.com:/ <diretorio_de_montagem_do_nfs>
-      echo "<id_do_efs>.efs.<região_de_montagem_do_efs>.amazonaws.com:/ <diretorio_de_montagem_do_nfs> nfs defaults 0 0" >> /etc/fstab
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install docker -y
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          sudo mkdir /mnt/efs
+          sudo chmod +rwx /mnt/efs
+          sudo yum install amazon-efs-utils -y
+          sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport <id-efs>.efs.us-east-1.amazonaws.com:/ mnt/efs
+          sudo sh -c 'echo "<id-efs>.efs.us-east-1.amazonaws.com:/ mnt/efs nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab'
+          sudo usermod -aG docker ec2-user
+          sudo chmod 666 /var/run/docker.sock
 
-      echo "version: '3.8'
-      services:
-        wordpress:
-          image: wordpress:latest
-          volumes:
-            - /mnt/efs/wordpress:/var/www/html
-          ports:
-            - 80:80
-          restart: always
-          environment:
-            WORDPRESS_DB_HOST: <EndPoint do DB>
-            WORDPRESS_DB_USER: <Master user do DB>
-            WORDPRESS_DB_PASSWORD: <Master password do DB>
-            WORDPRESS_DB_NAME: <Name do DB>
-            WORDPRESS_TABLE_CONFIG: wp_" | sudo tee /mnt/efs/docker-compose.yml
-      cd /mnt/efs && sudo docker-compose up -d
+          services:
+            wordpress:
+              image: wordpress:latest
+              volumes:
+                - /mnt/efs/wordpress:/var/www/html
+              ports:
+                - 80:80
+              restart: always
+              environment:
+                WORDPRESS_DB_HOST: <Endpoint DB>
+                WORDPRESS_DB_USER: <Master user DB>
+                WORDPRESS_DB_PASSWORD: <Master password DB>
+                WORDPRESS_DB_NAME: <Name DB>
+                WORDPRESS_TABLE_CONFIG: wp_ | sudo tee /mnt/efs/docker-compose.yaml
+      
+          docker-compose -f /mnt/efs/docker-compose.yaml up -d
       ```
 #
 ## Criação do LB (Load Balancer)
